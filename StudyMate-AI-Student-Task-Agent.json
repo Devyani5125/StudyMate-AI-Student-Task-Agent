@@ -1,0 +1,177 @@
+{
+  "name": "StudyMate AI – Student Task Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "StudyMate AI – Student Task Agent",
+        "formDescription": "List your tasks and deadlines. StudyMate AI will prioritize them and email you a study plan.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your Name",
+              "fieldName": "name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Your Email",
+              "fieldType": "email",
+              "fieldName": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tasks and Deadlines",
+              "fieldType": "textarea",
+              "fieldName": "tasks",
+              "placeholder": "One task per line, e.g.\nMath assignment - due Oct 25\nPhysics lab report - due Oct 28",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Study Hours Available Per Day",
+              "fieldType": "number",
+              "fieldName": "hours_per_day",
+              "placeholder": "e.g. 3"
+            }
+          ]
+        },
+        "options": {
+          "path": "studymate",
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Thanks! Your study plan will arrive by email shortly."
+            }
+          }
+        }
+      },
+      "id": "f82ca029-0051-49cd-bf63-7320694f94c3",
+      "name": "Student Task Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "54106c7e-3e0e-46e4-bd62-04b57fb1f235"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Today is {{ $now.toFormat(\"cccc, d LLLL yyyy\") }}.\nStudent name: {{ $json.name }}\nStudy hours available per day: {{ $json.hours_per_day || \"not specified\" }}\n\nTasks and deadlines:\n{{ $json.tasks }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are StudyMate AI, a friendly study planner for students. Given a list of tasks with deadlines, (1) rank the tasks by priority based on deadline urgency and likely effort, giving a one-line reason for each, and (2) build a day-by-day study plan from today until the last deadline that fits the available daily hours. End with 2-3 short study tips. Format the answer as simple HTML suitable for an email body (use <h3>, <ol>, <ul>, <p>, <b>). Do not include <html>, <head> or <body> tags and do not wrap the output in code fences."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "aedcfdad-6008-46fe-b59e-564f64f11f5b",
+      "name": "Create Study Plan",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        224,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5.4-mini",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "f8a980cc-8034-41f1-8813-728d1dc11e11",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        336
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $(\"Student Task Form\").item.json.email }}",
+        "subject": "Your StudyMate AI Study Plan",
+        "html": "={{ $('Create Study Plan').item.json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        112
+      ],
+      "id": "20aedd46-3efb-4926-b037-c0b56808cc1d",
+      "name": "Send an Email",
+      "webhookId": "62af657f-2d64-4a8a-961f-62db18b28df4",
+      "credentials": {
+        "smtp": {
+          "id": null,
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Student Task Form": {
+      "main": [
+        [
+          {
+            "node": "Create Study Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Study Plan": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Create Study Plan",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "beca6546-a8bf-4f01-8e0d-3b6b3887af94",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "id": "Q5H6EF5koOvnupAp",
+  "tags": []
+}
