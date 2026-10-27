@@ -1,5 +1,20 @@
 # StudyMate AI – Student Task Agent
 
+## 🚀 Live Demo
+
+Try StudyMate AI using the live form below:
+
+**[Open StudyMate AI – Generate Your Study Plan](https://studymate-project.app.n8n.cloud/form/studymate)**
+
+### How to Test
+1. Open the live demo form.
+2. Enter your name, email address, tasks, and deadlines.
+3. Specify how many hours you can study per day.
+4. Submit the form.
+5. Check your email for your personalized AI-generated study plan.
+
+**Note:** The demo uses n8n, an AI model, and email automation. Please enter a valid email address to receive the study plan.
+
 ## Overview
 StudyMate AI is an AI-powered student task planning agent built using n8n and OpenAI. It helps students organize their academic tasks, prioritize deadlines, and receive personalized study plans through email.
 
